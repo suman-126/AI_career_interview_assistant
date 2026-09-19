@@ -1,0 +1,58 @@
+PYTHON INTERVIEW
+
+Python is a high-level programming language known for its simple syntax and readability.
+
+Python is used for web development, automation, data analysis, artificial intelligence and machine learning.
+
+What is a list?
+A list is an ordered and changeable collection in Python.
+
+What is a tuple?
+A tuple is an ordered collection that cannot be changed after creation.
+
+What is a dictionary?
+A dictionary stores data in key-value pairs.
+
+What is a function?
+A function is a reusable block of code that performs a specific task.
+
+
+AI / MACHINE LEARNING INTERVIEW
+
+What is Artificial Intelligence?
+Artificial Intelligence is the ability of machines to perform tasks that normally require human intelligence.
+
+What is Machine Learning?
+Machine Learning is a branch of AI that allows computers to learn patterns from data and make predictions.
+
+
+HR INTERVIEW
+
+Tell me about yourself.
+I am a motivated fresher with an interest in technology and programming. I am eager to learn new skills and grow professionally.
+
+What are your strengths?
+My strengths are that I am a quick learner, hardworking, and willing to improve my skills.
+
+
+DATA SCIENCE INTERVIEW
+
+What is Data Science?
+Data Science is the field of extracting useful insights and knowledge from data.
+
+What is Pandas?
+Pandas is a Python library used for data manipulation and analysis.
+
+SQL INTERVIEW
+
+What is SQL?
+SQL is a language used to manage and query data stored in databases.
+
+What is a primary key?
+A primary key uniquely identifies each record in a database table.
+
+What is a foreign key?
+A foreign key is a field that connects one table to another table.
+
+What is the difference between WHERE and HAVING?
+WHERE filters rows before grouping, while HAVING filters groups after grouping.
