@@ -3,9 +3,12 @@ import streamlit as st
 import random
 from pypdf import PdfReader
 from langchain_core.documents import Document
-from langchain_community.document_loaders import TextLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
+from langchain_classic.retrievers.multi_query import MultiQueryRetriever
+from langchain_community.document_compressors import FlashrankRerank
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_ollama import ChatOllama
 
 # Chat history
@@ -30,6 +33,7 @@ if "practice_attempted" not in st.session_state:
 
 if "practice_score" not in st.session_state:
     st.session_state.practice_score = 0
+
 #Import the model of chatollama
 llm = ChatOllama(
     model="tinyllama:latest",
@@ -92,7 +96,6 @@ with st.sidebar:
     st.header("🤖 AI Interview Assistant")
     
     st.write("Prepare for your interviews with AI-powered assistance.")
-    
     st.divider()
     
     st.subheader("📚 Knowledge Base")
@@ -103,6 +106,7 @@ with st.sidebar:
     st.write("• AI-powered Answers")
     st.write("• Document-based Answers")
     st.write("• General AI Assistance")
+
 #Interview Category
     st.subheader("🎤 Interview Mode")
 
@@ -119,21 +123,33 @@ with st.sidebar:
         "AI / Machine Learning",
         "HR Interview",
         "Data Science",
-        "SQL Interview"
+        "SQL"
     ]
 )
 
     st.write("Selected:", category)
     st.info(f"You selected: {category}")
     
-    st.divider()
+    st.sidebar.divider()
     
-    st.caption("Built with Python, LangChain, FAISS & Ollama")
+    st.sidebar.subheader("🧠 RAG Pipeline")
+    
+    st.sidebar.caption("Embeddings: HuggingFace")
+    st.sidebar.caption("Vector Store: FAISS")
+    st.sidebar.caption("Retrieval:Multi-Query + Metadata Filtering")
+    st.sidebar.caption("Reranker: FlashRank")
+    st.sidebar.caption("LLM: TinyLlama + Ollama")
+    
+    #Clear chat
+    st.divider()
 
-#Clear chat
     if st.button("🗑️ Clear Chat"):
        st.session_state.messages = []
        st.rerun()
+
+    st.divider()
+    
+    st.caption("Built with Python, LangChain, FAISS & Ollama")
 
 #Welcome Section
 st.markdown(
@@ -154,84 +170,171 @@ st.markdown(
 )
 
 #Load the Document
-loader = TextLoader("interview_data.txt")
-documents = loader.load()
+# Create metadata-aware documents
+documents = [
+    Document(
+        page_content="What is a list in Python?\nA list is an ordered and changeable collection of items in Python.",
+        metadata={
+            "category": "Python",
+            "topic": "Lists",
+            "difficulty": "Beginner"
+        }
+    ),
 
-# Get the complete text
-text = documents[0].page_content
+    Document(
+        page_content="What is a tuple in Python?\nA tuple is an ordered and unchangeable collection of items in Python.",
+        metadata={
+            "category": "Python",
+            "topic": "Tuples",
+            "difficulty": "Beginner"
+        }
+    ),
 
-# Create category sections
-sections = {
-    "Python": text.split("AI / MACHINE LEARNING INTERVIEW")[0],
-    "AI / Machine Learning": text.split("AI / MACHINE LEARNING INTERVIEW")[1].split("HR INTERVIEW")[0],
-    "HR Interview": text.split("HR INTERVIEW")[1].split("DATA SCIENCE INTERVIEW")[0],
-    "Data Science": text.split("DATA SCIENCE INTERVIEW")[1].split("SQL INTERVIEW")[0],
-    "SQL Interview": text.split("SQL INTERVIEW")[1]
-}
+    Document(
+        page_content="What is a dictionary in Python?\nA dictionary stores data in key-value pairs.",
+        metadata={
+            "category": "Python",
+            "topic": "Dictionary",
+            "difficulty": "Beginner"
+        }
+    ),
 
+    Document(
+        page_content="What is a function in Python?\nA function is a reusable block of code that performs a specific task.",
+        metadata={
+            "category": "Python",
+            "topic": "Functions",
+            "difficulty": "Beginner"
+        }
+    ),
 
-# Create question-answer documents
+    Document(
+        page_content="What is Artificial Intelligence?\nArtificial Intelligence is the ability of machines to perform tasks that normally require human intelligence.",
+        metadata={
+            "category": "AI / Machine Learning",
+            "topic": "Artificial Intelligence",
+            "difficulty": "Beginner"
+        }
+    ),
 
-chunks = []
+    Document(
+        page_content="What is Machine Learning?\nMachine Learning is a branch of AI that allows computers to learn patterns from data and make predictions.",
+        metadata={
+            "category": "AI / Machine Learning",
+            "topic": "Machine Learning",
+            "difficulty": "Beginner"
+        }
+    ),
 
-for category_name, content in sections.items():
+    Document(
+        page_content="Tell me about yourself.\nI am a motivated fresher with an interest in technology and programming. I am eager to learn new skills and grow professionally.",
+        metadata={
+            "category": "HR Interview",
+            "topic": "Tell me about yourself",
+            "difficulty": "Beginner"
+        }
+    ),
 
-    lines = [line.strip() for line in content.strip().splitlines() if line.strip()]
+    Document(
+        page_content="What are your strengths?\nMy strengths are that I am a quick learner, hardworking, and willing to improve my skills.",
+        metadata={
+            "category": "HR Interview",
+            "topic": "Strengths",
+            "difficulty": "Beginner"
+        }
+    ),
 
-    current_question = None
-    current_answer = []
+    Document(
+        page_content="What is Data Science?\nData Science is the field of extracting useful insights and knowledge from data.",
+        metadata={
+            "category": "Data Science",
+            "topic": "Data Science",
+            "difficulty": "Beginner"
+        }
+    ),
 
-    for line in lines:
+    Document(
+        page_content="What is Pandas?\nPandas is a Python library used for data manipulation and analysis.",
+        metadata={
+            "category": "Data Science",
+            "topic": "Pandas",
+            "difficulty": "Beginner"
+        }
+    ),
 
-        is_question = (
-            line.endswith("?")
-            or line.startswith("Tell ")
-            or line.startswith("What ")
-            or line.startswith("Why ")
-            or line.startswith("How ")
-        )
+    Document(
+        page_content="What is SQL?\nSQL is a language used to manage and query data stored in databases.",
+        metadata={
+            "category": "SQL",
+            "topic": "SQL",
+            "difficulty": "Beginner"
+        }
+    ),
 
-        if is_question:
+    Document(
+        page_content="What is a primary key?\nA primary key uniquely identifies each record in a database table.",
+        metadata={
+            "category": "SQL",
+            "topic": "Primary Key",
+            "difficulty": "Beginner"
+        }
+    ),
 
-            if current_question:
-                chunks.append(
-                    Document(
-                        page_content=f"{current_question}\n{' '.join(current_answer)}",
-                        metadata={"category": category_name}
-                    )
-                )
+    Document(
+        page_content="What is a foreign key?\nA foreign key is a field that connects one table to another table.",
+        metadata={
+            "category": "SQL",
+            "topic": "Foreign Key",
+            "difficulty": "Beginner"
+        }
+    ),
 
-            current_question = line
-            current_answer = []
+    Document(
+        page_content="What is the difference between WHERE and HAVING?\nWHERE filters rows before grouping, while HAVING filters groups after grouping.",
+        metadata={
+            "category": "SQL",
+            "topic": "WHERE vs HAVING",
+            "difficulty": "Beginner"
+        }
+    )
+]
 
-        else:
-            if current_question:
-                current_answer.append(line)
+# ADVANCED RAG SETUP
 
-    if current_question:
-        chunks.append(
-            Document(
-                page_content=f"{current_question}\n{' '.join(current_answer)}",
-                metadata={"category": category_name}
-            )
-        )
+# Keep documents available for Practice Interview
+chunks = documents
 
-#Create embeddings
+# Embedding model
 embeddings = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2"
 )
 
-#Faiss stores the info
-vectorstore = FAISS.from_documents(
-    chunks,embeddings
+# Child splitter
+child_splitter = RecursiveCharacterTextSplitter(
+    chunk_size=200,
+    chunk_overlap=20
 )
 
-# Display chat history
+# Split documents into smaller chunks
+child_documents = child_splitter.split_documents(
+    documents
+)
+
+# FAISS vector store
+vectorstore = FAISS.from_documents(
+    child_documents,
+    embeddings
+)
+
+# FlashRank reranker
+reranker = FlashrankRerank()
+
+#DISPLAY CHAT HISTORY
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.write(message["content"])
 
-#Practice Interview Mode
+#PRACTICE INTERVIEW MODE
 if mode == "Practice Interview":
 
     st.subheader("🎤 Practice Interview")
@@ -402,86 +505,555 @@ Keep the feedback simple and short.
 
     st.divider()
 
+# =========================
 # Normal Ask Questions Mode
+# =========================
+
 if mode == "Ask Questions":
 
-    st.subheader("💬 Ask Your Interview Question")
-
-    st.caption(
-        "Ask a question about Python, AI, or interview preparation."
-    )
-
-    st.info(
-        "💡 Type your question below and press Enter to get your answer!"
-    )
+    st.subheader("💬 Ask Interview Questions")
 
     query = st.chat_input(
         "Ask your interview question..."
     )
 
-    # Run RAG only when a question is entered
     if query is not None and query.strip():
 
         query = query.strip()
 
-        # Store the chat history
-        st.session_state.messages.append({
-            "role": "user",
-            "content": query
-        })
+        # -------------------------------------------------
+        # Save user message
+        # -------------------------------------------------
 
-        st.chat_message("user").write(query)
-
-        results_with_scores = vectorstore.similarity_search_with_score(
-            query,
-            k=1,
-            filter={"category": category}
+        st.session_state.messages.append(
+            {
+                "role": "user",
+                "content": query
+            }
         )
 
-        if not results_with_scores:
+        with st.chat_message("user"):
+            st.write(query)
 
-            st.warning(
-                "No relevant information found."
+        # -------------------------------------------------
+        # Default values
+        # -------------------------------------------------
+
+        answer = (
+            "I couldn't find this information "
+            "in the selected category."
+        )
+
+        reranked_docs = []
+        used_fallback = False
+
+        # =================================================
+        # 1. Metadata Filtering
+        # =================================================
+
+        base_retriever = vectorstore.as_retriever(
+            search_kwargs={
+                "k": 3,
+                "filter": {
+                    "category": category
+                }
+            }
+        )
+
+        # =================================================
+        # 2. Multi-Query Retrieval
+        # =================================================
+
+        multi_query_retriever = MultiQueryRetriever.from_llm(
+            retriever=base_retriever,
+            llm=llm
+        )
+
+        retrieved_docs = multi_query_retriever.invoke(
+            query
+        )
+
+        # =================================================
+        # 3. Direct Similarity Retrieval
+        # =================================================
+
+        direct_docs = vectorstore.similarity_search(
+            query,
+            k=3,
+            filter={
+                "category": category
+            }
+        )
+
+        # =================================================
+        # 4. Combine Documents
+        # =================================================
+
+        all_docs = retrieved_docs + direct_docs
+
+        unique_docs = []
+        seen_contents = set()
+
+        for doc in all_docs:
+
+            content = doc.page_content.strip()
+
+            if content not in seen_contents:
+
+                unique_docs.append(doc)
+                seen_contents.add(content)
+
+        # =================================================
+        # 5. Topic Normalization
+        # =================================================
+
+        def normalize_topic(text):
+
+            text = text.lower().strip()
+
+            for symbol in [
+                "?",
+                ".",
+                ",",
+                "!",
+                ":",
+                "'",
+                '"'
+            ]:
+
+                text = text.replace(
+                    symbol,
+                    ""
+                )
+
+            # Normalize common plural forms
+            if text.endswith("ies"):
+
+                text = text[:-3] + "y"
+
+            elif (
+                text.endswith("s")
+                and not text.endswith("ss")
+            ):
+
+                text = text[:-1]
+
+            return " ".join(
+                text.split()
+            ).strip()
+
+        # =================================================
+        # 6. Normalize Complete Question
+        # =================================================
+
+        normalized_full_query = normalize_topic(
+            query
+        )
+
+        # =================================================
+        # 7. Stop Words
+        # =================================================
+
+        stop_words = {
+            "what",
+            "is",
+            "are",
+            "a",
+            "an",
+            "the",
+            "in",
+            "of",
+            "to",
+            "and",
+            "for",
+            "on",
+            "with",
+            "how",
+            "why",
+            "can",
+            "does",
+            "do",
+            "please",
+            "give",
+            "difference",
+            "between",
+            "python",
+            "sql"
+        }
+
+        # =================================================
+        # 8. Extract Important Query Words
+        # =================================================
+
+        query_words = []
+
+        for word in normalized_full_query.split():
+
+            if word not in stop_words:
+
+                query_words.append(
+                    word
+                )
+
+        normalized_query = " ".join(
+            query_words
+        )
+
+        # =================================================
+        # 9. Find Matching Topics
+        # =================================================
+
+        matching_docs = []
+
+        for doc in unique_docs:
+
+            topic = normalize_topic(
+                doc.metadata.get(
+                    "topic",
+                    ""
+                )
             )
 
-            st.stop()
+            if not topic:
+                continue
 
-        result, score = results_with_scores[0]
+            # ---------------------------------------------
+            # FIRST: Match the complete topic against
+            # the complete question.
+            #
+            # This is important for HR questions such as:
+            #
+            # "Tell me about yourself?"
+            #
+            # Topic:
+            # "Tell me about yourself"
+            # ---------------------------------------------
 
-        if score < 1.0:
+            if topic in normalized_full_query:
 
-            context = result.page_content
+                matching_docs.append(
+                    doc
+                )
 
-            answer = context.split(
-                "\n",
-                1
-            )[1].strip()
+                continue
 
-            st.session_state.messages.append({
-                "role": "assistant",
-                "content": answer
-            })
+            # ---------------------------------------------
+            # SECOND: Match against the cleaned question.
+            #
+            # Example:
+            #
+            # What is machine learning?
+            # -> machine learning
+            # ---------------------------------------------
 
-            with st.chat_message("assistant"):
-                st.write(answer)
+            if topic == normalized_query:
+
+                matching_docs.append(
+                    doc
+                )
+
+                continue
+
+            # ---------------------------------------------
+            # THIRD: Multi-word topic matching
+            # ---------------------------------------------
+
+            if (
+                len(topic.split()) > 1
+                and topic in normalized_query
+            ):
+
+                matching_docs.append(
+                    doc
+                )
+
+                continue
+
+            # ---------------------------------------------
+            # FOURTH: Single-word topic matching
+            # ---------------------------------------------
+
+            if (
+                len(topic.split()) == 1
+                and topic in query_words
+            ):
+
+                matching_docs.append(
+                    doc
+                )
+
+                continue
+
+        # =================================================
+        # 10. FlashRank Reranking
+        # =================================================
+
+        if matching_docs:
+
+            reranked_docs = reranker.compress_documents(
+                matching_docs,
+                query
+            )
+
+            if reranked_docs:
+
+                result = reranked_docs[0]
+
+            else:
+
+                result = matching_docs[0]
+
+            context = result.page_content.strip()
+
+            # ---------------------------------------------
+            # Remove the question line and show only answer
+            # ---------------------------------------------
+
+            if "\n" in context:
+
+                answer = context.split(
+                    "\n",
+                    1
+                )[1].strip()
+
+            else:
+
+                answer = context
+
+        # =================================================
+        # 11. LLM FALLBACK
+        # =================================================
 
         else:
 
-            st.write(
-                "💡 I couldn't find this question in the interview "
-                "knowledge base, so I'll answer it using general AI knowledge."
+            used_fallback = True
+
+            fallback_llm = ChatOllama(
+                model="tinyllama:latest",
+                temperature=0,
+                num_predict=80
             )
 
-            response = llm.invoke(query)
+            fallback_prompt = ChatPromptTemplate.from_template(
+                """
+Give a short factual answer to this question.
 
-            st.session_state.messages.append({
+Question:
+{question}
+
+Answer in two simple sentences.
+"""
+            )
+
+            fallback_response = fallback_llm.invoke(
+                fallback_prompt.format(
+                    question=query
+                )
+            )
+
+            raw_answer = (
+                fallback_response.content.strip()
+            )
+
+            # ---------------------------------------------
+            # Remove markdown code blocks
+            # ---------------------------------------------
+
+            if "```" in raw_answer:
+
+                raw_answer = raw_answer.split(
+                    "```",
+                    1
+                )[0].strip()
+
+            # ---------------------------------------------
+            # Clean lines
+            # ---------------------------------------------
+
+            lines = raw_answer.splitlines()
+
+            clean_lines = []
+
+            for line in lines:
+
+                line = line.strip()
+
+                if not line:
+                    continue
+
+                # Remove numbered list items
+                if line[0:2] in [
+                    "1.",
+                    "2.",
+                    "3.",
+                    "4.",
+                    "5.",
+                    "6.",
+                    "7.",
+                    "8.",
+                    "9."
+                ]:
+
+                    continue
+
+                if "do not" in line.lower():
+
+                    continue
+
+                clean_lines.append(
+                    line
+                )
+
+            raw_answer = " ".join(
+                clean_lines
+            ).strip()
+
+            # ---------------------------------------------
+            # Remove unwanted labels
+            # ---------------------------------------------
+
+            if "Answer:" in raw_answer:
+
+                raw_answer = raw_answer.split(
+                    "Answer:",
+                    1
+                )[-1].strip()
+
+            if "Question:" in raw_answer:
+
+                raw_answer = raw_answer.split(
+                    "Question:",
+                    1
+                )[-1].strip()
+
+            # ---------------------------------------------
+            # Keep maximum two useful sentences
+            # ---------------------------------------------
+
+            import re
+
+            sentences = re.split(
+                r'(?<=[.!?])\s+',
+                raw_answer
+            )
+
+            useful_sentences = []
+
+            for sentence in sentences:
+
+                sentence = sentence.strip()
+
+                if not sentence:
+                    continue
+
+                if "do not" in sentence.lower():
+                    continue
+
+                useful_sentences.append(
+                    sentence
+                )
+
+                if len(useful_sentences) == 2:
+                    break
+
+            answer = " ".join(
+                useful_sentences
+            ).strip()
+
+            if not answer:
+
+                answer = (
+                    "I couldn't generate a "
+                    "reliable answer right now."
+                )
+
+        # =================================================
+        # 12. Save Assistant Answer
+        # =================================================
+
+        st.session_state.messages.append(
+            {
                 "role": "assistant",
-                "content": response.content
-            })
+                "content": answer
+            }
+        )
 
-            with st.chat_message("assistant"):
-                st.write(response.content)
+        # =================================================
+        # 13. Display Assistant Answer
+        # =================================================
+
+        with st.chat_message("assistant"):
+
+            st.write(answer)
+
+        # =================================================
+        # 14. Retrieved Context
+        # =================================================
+
+        if (
+            not used_fallback
+            and reranked_docs
+        ):
+
+            with st.expander(
+                "📚 Retrieved Context"
+            ):
+
+                result = reranked_docs[0]
+
+                st.write(
+                    result.page_content
+                )
+
+                st.write(
+                    "**Topic:** "
+                    + str(
+                        result.metadata.get(
+                            "topic",
+                            "N/A"
+                        )
+                    )
+                )
+
+                st.write(
+                    "**Category:** "
+                    + str(
+                        result.metadata.get(
+                            "category",
+                            "N/A"
+                        )
+                    )
+                )
+
+                st.write(
+                    "**Difficulty:** "
+                    + str(
+                        result.metadata.get(
+                            "difficulty",
+                            "N/A"
+                        )
+                    )
+                )
+
+        # =================================================
+        # 15. General AI Answer
+        # =================================================
+
+        if used_fallback:
+
+            with st.expander(
+                "🤖 General AI Answer"
+            ):
+
+                st.caption(
+                    "This answer was generated "
+                    "by the AI assistant."
+                )
+
+                
+# =========================
 # Resume Analysis
+# =========================
 st.divider()
 
 st.subheader("📄 Resume Analysis")
@@ -824,5 +1396,4 @@ if uploaded_resume:
         st.warning(
             "⚠️ Could not extract text from this resume."
         )
-
 

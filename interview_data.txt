@@ -1,20 +1,17 @@
-PYTHON INTERVIEW
+Python Interview
 
-Python is a high-level programming language known for its simple syntax and readability.
+Q: What is a list in Python?
+A: A list is an ordered and changeable collection of items in Python.
 
-Python is used for web development, automation, data analysis, artificial intelligence and machine learning.
+Q: What is a tuple in Python?
+A: A tuple is an ordered and unchangeable collection of items in Python.
 
-What is a list?
-A list is an ordered and changeable collection in Python.
+Q: What is a dictionary in Python?
+A: A dictionary stores data in key-value pairs.
 
-What is a tuple?
-A tuple is an ordered collection that cannot be changed after creation.
+Q: What is a function in Python?
+A: A function is a reusable block of code that performs a specific task.
 
-What is a dictionary?
-A dictionary stores data in key-value pairs.
-
-What is a function?
-A function is a reusable block of code that performs a specific task.
 
 
 AI / MACHINE LEARNING INTERVIEW
