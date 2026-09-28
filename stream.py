@@ -1,4 +1,4 @@
-#Imports
+# IMPORTS
 import streamlit as st
 import random
 from pypdf import PdfReader
@@ -11,11 +11,13 @@ from langchain_community.document_compressors import FlashrankRerank
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_ollama import ChatOllama
 
-# Chat history
+# CHAT HISTORY
+
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Practice Interview state
+# PRACTICE INTERVIEW STATE
+
 if "practice_started" not in st.session_state:
     st.session_state.practice_started = False
 
@@ -34,14 +36,16 @@ if "practice_attempted" not in st.session_state:
 if "practice_score" not in st.session_state:
     st.session_state.practice_score = 0
 
-#Import the model of chatollama
+#IMPORT THE MODEL OF CHAT OLLAMA
+
 llm = ChatOllama(
     model="tinyllama:latest",
     temperature=0,
     num_predict=500
 )
-#Title
-#Custom CSS
+# TITLE
+# CUSTOM CSS
+
 st.markdown(
     """
     <style>
@@ -80,7 +84,8 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-#Title
+
+# TITLE
 st.markdown(
     '<div class="main-title">🤖 AI Career & Interview Assistant</div>',
     unsafe_allow_html=True
@@ -91,7 +96,8 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-#Sidebar
+# SIDEBAR
+
 with st.sidebar:
     st.header("🤖 AI Interview Assistant")
     
@@ -107,7 +113,8 @@ with st.sidebar:
     st.write("• Document-based Answers")
     st.write("• General AI Assistance")
 
-#Interview Category
+# INTERVIEW CATEGORY
+
     st.subheader("🎤 Interview Mode")
 
     mode = st.radio(
@@ -140,7 +147,7 @@ with st.sidebar:
     st.sidebar.caption("Reranker: FlashRank")
     st.sidebar.caption("LLM: TinyLlama + Ollama")
     
-    #Clear chat
+    # CLEAR CHAT
     st.divider()
 
     if st.button("🗑️ Clear Chat"):
@@ -151,7 +158,7 @@ with st.sidebar:
     
     st.caption("Built with Python, LangChain, FAISS & Ollama")
 
-#Welcome Section
+# WELCOME SECTION
 st.markdown(
     """
     <div class="welcome-box">
@@ -169,8 +176,8 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-#Load the Document
-# Create metadata-aware documents
+# LOAD THE DOCUMENT
+# CREATE METADATA AWARE DOCUMENTS
 documents = [
     Document(
         page_content="What is a list in Python?\nA list is an ordered and changeable collection of items in Python.",
@@ -301,26 +308,27 @@ documents = [
 
 # ADVANCED RAG SETUP
 
-# Keep documents available for Practice Interview
+# Keep DOcuments Available For Practice Interview
 chunks = documents
 
-# Embedding model
+# Embedding Model
+
 embeddings = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2"
 )
 
-# Child splitter
+# Child Splitter
 child_splitter = RecursiveCharacterTextSplitter(
     chunk_size=200,
     chunk_overlap=20
 )
 
-# Split documents into smaller chunks
+# Split Documents Into Smaller Chunks
 child_documents = child_splitter.split_documents(
     documents
 )
 
-# FAISS vector store
+# FAISS Vector Store
 vectorstore = FAISS.from_documents(
     child_documents,
     embeddings
@@ -330,11 +338,13 @@ vectorstore = FAISS.from_documents(
 reranker = FlashrankRerank()
 
 #DISPLAY CHAT HISTORY
+
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.write(message["content"])
 
 #PRACTICE INTERVIEW MODE
+
 if mode == "Practice Interview":
 
     st.subheader("🎤 Practice Interview")
@@ -380,7 +390,7 @@ if mode == "Practice Interview":
                 "No interview questions found for this category."
             )
 
-    # Interview started
+    # Interview Started
     if st.session_state.practice_started:
 
         st.info(
@@ -505,9 +515,7 @@ Keep the feedback simple and short.
 
     st.divider()
 
-# =========================
-# Normal Ask Questions Mode
-# =========================
+# NORMAL ASK QUESTION MODE
 
 if mode == "Ask Questions":
 
@@ -521,10 +529,7 @@ if mode == "Ask Questions":
 
         query = query.strip()
 
-        # -------------------------------------------------
-        # Save user message
-        # -------------------------------------------------
-
+        # Save User Message
         st.session_state.messages.append(
             {
                 "role": "user",
@@ -535,10 +540,8 @@ if mode == "Ask Questions":
         with st.chat_message("user"):
             st.write(query)
 
-        # -------------------------------------------------
-        # Default values
-        # -------------------------------------------------
-
+        
+        # Default Values
         answer = (
             "I couldn't find this information "
             "in the selected category."
@@ -547,10 +550,7 @@ if mode == "Ask Questions":
         reranked_docs = []
         used_fallback = False
 
-        # =================================================
         # 1. Metadata Filtering
-        # =================================================
-
         base_retriever = vectorstore.as_retriever(
             search_kwargs={
                 "k": 3,
@@ -560,10 +560,7 @@ if mode == "Ask Questions":
             }
         )
 
-        # =================================================
         # 2. Multi-Query Retrieval
-        # =================================================
-
         multi_query_retriever = MultiQueryRetriever.from_llm(
             retriever=base_retriever,
             llm=llm
@@ -573,10 +570,7 @@ if mode == "Ask Questions":
             query
         )
 
-        # =================================================
         # 3. Direct Similarity Retrieval
-        # =================================================
-
         direct_docs = vectorstore.similarity_search(
             query,
             k=3,
@@ -585,10 +579,8 @@ if mode == "Ask Questions":
             }
         )
 
-        # =================================================
-        # 4. Combine Documents
-        # =================================================
 
+        # 4. Combine Documents
         all_docs = retrieved_docs + direct_docs
 
         unique_docs = []
@@ -603,10 +595,7 @@ if mode == "Ask Questions":
                 unique_docs.append(doc)
                 seen_contents.add(content)
 
-        # =================================================
         # 5. Topic Normalization
-        # =================================================
-
         def normalize_topic(text):
 
             text = text.lower().strip()
@@ -642,17 +631,12 @@ if mode == "Ask Questions":
                 text.split()
             ).strip()
 
-        # =================================================
         # 6. Normalize Complete Question
-        # =================================================
-
         normalized_full_query = normalize_topic(
             query
         )
 
-        # =================================================
         # 7. Stop Words
-        # =================================================
 
         stop_words = {
             "what",
@@ -681,10 +665,7 @@ if mode == "Ask Questions":
             "sql"
         }
 
-        # =================================================
         # 8. Extract Important Query Words
-        # =================================================
-
         query_words = []
 
         for word in normalized_full_query.split():
@@ -699,10 +680,7 @@ if mode == "Ask Questions":
             query_words
         )
 
-        # =================================================
         # 9. Find Matching Topics
-        # =================================================
-
         matching_docs = []
 
         for doc in unique_docs:
@@ -784,10 +762,7 @@ if mode == "Ask Questions":
 
                 continue
 
-        # =================================================
         # 10. FlashRank Reranking
-        # =================================================
-
         if matching_docs:
 
             reranked_docs = reranker.compress_documents(
@@ -805,10 +780,7 @@ if mode == "Ask Questions":
 
             context = result.page_content.strip()
 
-            # ---------------------------------------------
             # Remove the question line and show only answer
-            # ---------------------------------------------
-
             if "\n" in context:
 
                 answer = context.split(
@@ -820,10 +792,7 @@ if mode == "Ask Questions":
 
                 answer = context
 
-        # =================================================
         # 11. LLM FALLBACK
-        # =================================================
-
         else:
 
             used_fallback = True
@@ -855,10 +824,7 @@ Answer in two simple sentences.
                 fallback_response.content.strip()
             )
 
-            # ---------------------------------------------
             # Remove markdown code blocks
-            # ---------------------------------------------
-
             if "```" in raw_answer:
 
                 raw_answer = raw_answer.split(
@@ -866,10 +832,7 @@ Answer in two simple sentences.
                     1
                 )[0].strip()
 
-            # ---------------------------------------------
             # Clean lines
-            # ---------------------------------------------
-
             lines = raw_answer.splitlines()
 
             clean_lines = []
@@ -908,10 +871,7 @@ Answer in two simple sentences.
                 clean_lines
             ).strip()
 
-            # ---------------------------------------------
             # Remove unwanted labels
-            # ---------------------------------------------
-
             if "Answer:" in raw_answer:
 
                 raw_answer = raw_answer.split(
@@ -926,10 +886,7 @@ Answer in two simple sentences.
                     1
                 )[-1].strip()
 
-            # ---------------------------------------------
             # Keep maximum two useful sentences
-            # ---------------------------------------------
-
             import re
 
             sentences = re.split(
@@ -967,10 +924,7 @@ Answer in two simple sentences.
                     "reliable answer right now."
                 )
 
-        # =================================================
         # 12. Save Assistant Answer
-        # =================================================
-
         st.session_state.messages.append(
             {
                 "role": "assistant",
@@ -978,18 +932,13 @@ Answer in two simple sentences.
             }
         )
 
-        # =================================================
         # 13. Display Assistant Answer
-        # =================================================
-
         with st.chat_message("assistant"):
 
             st.write(answer)
 
-        # =================================================
+        
         # 14. Retrieved Context
-        # =================================================
-
         if (
             not used_fallback
             and reranked_docs
@@ -1035,10 +984,7 @@ Answer in two simple sentences.
                     )
                 )
 
-        # =================================================
         # 15. General AI Answer
-        # =================================================
-
         if used_fallback:
 
             with st.expander(
@@ -1050,10 +996,8 @@ Answer in two simple sentences.
                     "by the AI assistant."
                 )
 
-                
-# =========================
-# Resume Analysis
-# =========================
+
+# RESUME ANALYSIS
 st.divider()
 
 st.subheader("📄 Resume Analysis")
@@ -1086,7 +1030,6 @@ if uploaded_resume:
 
  
     # Read TXT
-
     elif uploaded_resume.name.lower().endswith(".txt"):
 
         resume_text = uploaded_resume.read().decode(
@@ -1098,7 +1041,6 @@ if uploaded_resume:
 
     
     # Check resume
-    
     if resume_text:
 
         st.success("✅ Resume uploaded successfully!")
@@ -1112,7 +1054,6 @@ if uploaded_resume:
 
         
             # 1. SKILLS
-    
             skill_list = [
                 "PHP",
                 "HTML",
@@ -1136,8 +1077,6 @@ if uploaded_resume:
 
             
             # 2. EDUCATION
-    
-
             education_lines = []
 
             for line in resume_text.splitlines():
@@ -1165,8 +1104,6 @@ if uploaded_resume:
 
             
             # 3. PROJECTS
-        
-
             project_lines = []
 
             project_names = [
@@ -1193,7 +1130,6 @@ if uploaded_resume:
 
             
             # 4. TRAINING
-
             training_lines = []
 
             training_keywords = [
@@ -1224,19 +1160,13 @@ if uploaded_resume:
 
         
             # 5. WORK EXPERIENCE
-        
             is_fresher ="fresher" in text_lower
         
             
             # DISPLAY ANALYSIS
-            
-
             st.subheader("🤖 Resume Analysis")
 
-        
             # Skills
-            
-
             st.markdown("### 🎯 Skills Found")
 
             if found_skills:
@@ -1251,7 +1181,6 @@ if uploaded_resume:
                 )
 
             # Education
-        
             st.markdown("### 🎓 Education")
 
             if education_lines:
@@ -1267,7 +1196,6 @@ if uploaded_resume:
 
 
             # Projects
-            
             st.markdown("### 💻 Projects")
 
             if project_lines:
@@ -1281,10 +1209,7 @@ if uploaded_resume:
                     "Not mentioned in the resume."
                 )
 
-            
             # Training
-        
-
             st.markdown("### 📚 Training")
 
             if training_lines:
@@ -1299,7 +1224,6 @@ if uploaded_resume:
                 )
 
             # Work Experience
-        
             st.markdown("### 💼 Work Experience")
 
             if is_fresher:
@@ -1314,10 +1238,7 @@ if uploaded_resume:
                     "• Work experience is mentioned in the resume."
                 )
 
-            
             # AREAS TO IMPROVE
-        
-
             st.markdown("### ⚠️ Areas to Improve")
 
             st.write(
@@ -1334,7 +1255,6 @@ if uploaded_resume:
 
             
             # INTERVIEW PREPARATION
-        
             st.markdown("### 🎤 Interview Preparation")
 
             interview_topics = []
@@ -1397,3 +1317,4 @@ if uploaded_resume:
             "⚠️ Could not extract text from this resume."
         )
 
+# “Continue my AI Career & Interview Assistant — add the Practice Test feature.”

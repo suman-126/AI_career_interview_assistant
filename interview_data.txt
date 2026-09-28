@@ -1,16 +1,16 @@
 Python Interview
 
-Q: What is a list in Python?
-A: A list is an ordered and changeable collection of items in Python.
+What is a list in Python?
+A list is an ordered and changeable collection of items in Python.
 
-Q: What is a tuple in Python?
-A: A tuple is an ordered and unchangeable collection of items in Python.
+What is a tuple in Python?
+A tuple is an ordered and unchangeable collection of items in Python.
 
-Q: What is a dictionary in Python?
-A: A dictionary stores data in key-value pairs.
+What is a dictionary in Python?
+A dictionary stores data in key-value pairs.
 
-Q: What is a function in Python?
-A: A function is a reusable block of code that performs a specific task.
+What is a function in Python?
+A function is a reusable block of code that performs a specific task.
 
 
 
