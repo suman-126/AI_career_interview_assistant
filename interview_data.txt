@@ -1,55 +1,291 @@
-Python Interview
+Interview Question in Text Form
 
-What is a list in Python?
-A list is an ordered and changeable collection of items in Python.
+=== PYTHON ===
 
-What is a tuple in Python?
-A tuple is an ordered and unchangeable collection of items in Python.
+[Beginner]
 
-What is a dictionary in Python?
-A dictionary stores data in key-value pairs.
+Q: What is a list in Python?
+A: A list is an ordered and changeable collection of items in Python.
 
-What is a function in Python?
-A function is a reusable block of code that performs a specific task.
+Q: What is a tuple in Python?
+A: A tuple is an ordered and immutable collection of items in Python.
 
+Q: What is a dictionary in Python?
+A: A dictionary stores data in key-value pairs.
 
+Q: What is a function in Python?
+A: A function is a reusable block of code that performs a specific task.
 
-AI / MACHINE LEARNING INTERVIEW
-
-What is Artificial Intelligence?
-Artificial Intelligence is the ability of machines to perform tasks that normally require human intelligence.
-
-What is Machine Learning?
-Machine Learning is a branch of AI that allows computers to learn patterns from data and make predictions.
+Q: What is a variable in Python?
+A: A variable is a name used to store a value in Python.
 
 
+[Intermediate]
+
+Q: What is a lambda function in Python?
+A: A lambda function is a small anonymous function defined using the lambda keyword.
+
+Q: What is exception handling in Python?
+A: Exception handling manages runtime errors using keywords such as try, except, else, and finally.
+
+Q: What is a list comprehension in Python?
+A: A list comprehension is a concise way to create a list using an expression and a loop.
+
+Q: What is the difference between == and is in Python?
+A: The == operator compares values, while the is operator checks whether two references point to the same object.
+
+Q: What is a Python module?
+A: A module is a Python file containing reusable code such as functions, classes, and variables.
+
+
+[Advanced]
+
+Q: What is a decorator in Python?
+A: A decorator is a function that modifies or extends the behavior of another function without changing its source code.
+
+Q: What is a generator in Python?
+A: A generator is a special type of iterator that produces values one at a time using the yield keyword.
+
+Q: What is the Global Interpreter Lock in Python?
+A: The Global Interpreter Lock, or GIL, allows only one thread to execute Python bytecode at a time in a standard CPython implementation.
+
+Q: What is a context manager in Python?
+A: A context manager manages resources using the with statement and commonly defines __enter__ and __exit__ methods.
+
+Q: What is method resolution order in Python?
+A: Method Resolution Order, or MRO, determines the order in which Python searches classes when resolving methods, especially with inheritance.
+
+
+========================================
+AI / MACHINE LEARNING
+========================================
+
+[Beginner]
+
+Q: What is Artificial Intelligence?
+A: Artificial Intelligence is the field of creating systems that can perform tasks that normally require human intelligence.
+
+Q: What is Machine Learning?
+A: Machine Learning is a branch of AI that enables computers to learn patterns from data and make predictions or decisions.
+
+Q: What is supervised learning?
+A: Supervised learning is a machine learning approach where a model learns from labeled training data.
+
+Q: What is unsupervised learning?
+A: Unsupervised learning finds patterns or structures in data without labeled output values.
+
+Q: What is a training dataset?
+A: A training dataset is the data used to teach a machine learning model to recognize patterns.
+
+
+[Intermediate]
+
+Q: What is classification in machine learning?
+A: Classification is a supervised learning task that predicts a category or class for an input.
+
+Q: What is regression in machine learning?
+A: Regression is a supervised learning task used to predict continuous numerical values.
+
+Q: What is overfitting?
+A: Overfitting occurs when a machine learning model learns the training data too closely and performs poorly on unseen data.
+
+Q: What is cross-validation?
+A: Cross-validation is a technique for evaluating a machine learning model by splitting data into multiple training and validation sets.
+
+Q: What is feature engineering?
+A: Feature engineering is the process of creating, transforming, or selecting useful features from raw data for a machine learning model.
+
+
+[Advanced]
+
+Q: What is a neural network?
+A: A neural network is a machine learning model made of interconnected layers of nodes that can learn complex patterns from data.
+
+Q: What is gradient descent?
+A: Gradient descent is an optimization algorithm that updates model parameters to minimize a loss function.
+
+Q: What is backpropagation?
+A: Backpropagation is an algorithm used to calculate gradients of a neural network's loss with respect to its parameters.
+
+Q: What is regularization in machine learning?
+A: Regularization adds a penalty to a model's objective function to reduce overfitting and encourage simpler models.
+
+Q: What is transfer learning?
+A: Transfer learning uses knowledge learned by a model on one task or dataset to help solve another related task.
+
+
+========================================
 HR INTERVIEW
+========================================
 
-Tell me about yourself.
-I am a motivated fresher with an interest in technology and programming. I am eager to learn new skills and grow professionally.
+[Beginner]
 
-What are your strengths?
-My strengths are that I am a quick learner, hardworking, and willing to improve my skills.
+Q: Tell me about yourself.
+A: I am a motivated fresher with an interest in technology and programming. I am eager to learn new skills and contribute to the organization.
+
+Q: What are your strengths?
+A: My strengths are willingness to learn, problem-solving, communication, and the ability to adapt to new situations.
+
+Q: What is your weakness?
+A: As a fresher, I am still improving my practical experience, so I actively work on projects and practice my technical skills.
+
+Q: Why should we hire you?
+A: As a fresher, I bring enthusiasm, willingness to learn, technical knowledge, and a strong interest in contributing to the team.
+
+Q: Why do you want to join our company?
+A: I want to join a company where I can apply my skills, learn from experienced professionals, and grow professionally.
 
 
-DATA SCIENCE INTERVIEW
+[Intermediate]
 
-What is Data Science?
-Data Science is the field of extracting useful insights and knowledge from data.
+Q: How do you handle criticism?
+A: I listen carefully to constructive criticism, understand what I can improve, and use the feedback to perform better.
 
-What is Pandas?
-Pandas is a Python library used for data manipulation and analysis.
+Q: Describe a challenge you faced.
+A: During a project, I faced technical problems, researched possible solutions, tested different approaches, and completed the task successfully.
 
-SQL INTERVIEW
+Q: Where do you see yourself in five years?
+A: I see myself as a skilled professional with stronger technical knowledge, practical experience, and greater responsibilities.
 
-What is SQL?
-SQL is a language used to manage and query data stored in databases.
+Q: How do you handle pressure?
+A: I stay organized, prioritize important tasks, remain calm, and complete work step by step.
 
-What is a primary key?
-A primary key uniquely identifies each record in a database table.
+Q: Why did you choose your career field?
+A: I chose this field because I enjoy programming, technology, and solving problems using software.
 
-What is a foreign key?
-A foreign key is a field that connects one table to another table.
 
-What is the difference between WHERE and HAVING?
-WHERE filters rows before grouping, while HAVING filters groups after grouping.
+[Advanced]
+
+Q: How would you handle a disagreement with a teammate?
+A: I would listen to the teammate's viewpoint, discuss the issue calmly, focus on the project goal, and work toward a practical solution.
+
+Q: How would you prioritize multiple urgent tasks?
+A: I would evaluate deadlines, importance, dependencies, and impact, then organize the tasks and communicate if priorities conflict.
+
+Q: How would you respond if you made a serious mistake at work?
+A: I would acknowledge the mistake, understand its impact, inform the appropriate person, correct it, and take steps to prevent it from happening again.
+
+Q: How would you adapt to a completely new technology at work?
+A: I would learn the fundamentals, use reliable documentation, practice with small tasks, and gradually apply the technology to the project.
+
+Q: How would you handle a situation where you disagree with your manager?
+A: I would respectfully explain my reasoning, listen to the manager's perspective, consider the project requirements, and support the final decision professionally.
+
+
+========================================
+DATA SCIENCE
+========================================
+
+[Beginner]
+
+Q: What is Data Science?
+A: Data Science is the field of using data, statistics, programming, and machine learning to extract useful insights and support decisions.
+
+Q: What is Pandas?
+A: Pandas is a Python library used for data manipulation and analysis.
+
+Q: What is a DataFrame?
+A: A DataFrame is a two-dimensional labeled data structure provided by Pandas.
+
+Q: What is data cleaning?
+A: Data cleaning is the process of identifying and correcting missing, incorrect, duplicate, or inconsistent data.
+
+Q: What is data visualization?
+A: Data visualization is the process of representing data using charts, graphs, and other visual formats.
+
+
+[Intermediate]
+
+Q: What is Exploratory Data Analysis?
+A: Exploratory Data Analysis, or EDA, is the process of examining and summarizing data to discover patterns, relationships, and unusual values.
+
+Q: How can missing data be handled?
+A: Missing data can be handled by removing affected records, filling values using suitable methods, or using algorithms that support missing values.
+
+Q: What is correlation?
+A: Correlation measures the strength and direction of the relationship between two variables.
+
+Q: What is an outlier?
+A: An outlier is a data point that is unusually different from other observations in a dataset.
+
+Q: What is NumPy used for in data science?
+A: NumPy is a Python library that provides efficient numerical arrays and mathematical operations.
+
+
+[Advanced]
+
+Q: What is normalization in data preprocessing?
+A: Normalization transforms numerical features to a common scale so that differences in feature ranges do not disproportionately affect a model.
+
+Q: What is feature selection?
+A: Feature selection is the process of choosing the most relevant input variables for a model while removing unnecessary or redundant features.
+
+Q: What is dimensionality reduction?
+A: Dimensionality reduction reduces the number of features in a dataset while attempting to preserve important information.
+
+Q: What is principal component analysis?
+A: Principal Component Analysis, or PCA, is a dimensionality reduction technique that transforms correlated features into a smaller set of principal components.
+
+Q: What is data leakage?
+A: Data leakage occurs when information that should not be available during model training is unintentionally used, causing overly optimistic evaluation results.
+
+
+========================================
+SQL
+========================================
+
+[Beginner]
+
+Q: What is SQL?
+A: SQL stands for Structured Query Language and is used to manage and query relational databases.
+
+Q: What is a primary key?
+A: A primary key is a column or combination of columns that uniquely identifies each row in a table.
+
+Q: What is a foreign key?
+A: A foreign key is a column that references a key in another table to establish a relationship between tables.
+
+Q: What is the SELECT statement in SQL?
+A: The SELECT statement is used to retrieve data from one or more database tables.
+
+Q: What is a JOIN in SQL?
+A: A JOIN combines rows from two or more tables based on a related column.
+
+
+[Intermediate]
+
+Q: What is the difference between WHERE and HAVING in SQL?
+A: WHERE filters rows before grouping, while HAVING filters groups after GROUP BY is applied.
+
+Q: What is an INNER JOIN?
+A: An INNER JOIN returns only the rows that have matching values in both joined tables.
+
+Q: What is GROUP BY in SQL?
+A: GROUP BY groups rows with the same values so aggregate functions can be applied to each group.
+
+Q: What are aggregate functions in SQL?
+A: Aggregate functions perform calculations on multiple rows and return a single result, such as COUNT, SUM, AVG, MIN, and MAX.
+
+Q: What is a subquery in SQL?
+A: A subquery is a query nested inside another SQL query.
+
+
+[Advanced]
+
+Q: What is database normalization?
+A: Database normalization organizes data into related tables to reduce redundancy and improve data consistency.
+
+Q: What is a window function in SQL?
+A: A window function performs a calculation across related rows without grouping those rows into a single output row.
+
+Q: What is a Common Table Expression in SQL?
+A: A Common Table Expression, or CTE, is a temporary named result set defined using the WITH clause that can be referenced by a SQL query.
+
+Q: What is an index in a database?
+A: An index is a database structure that can improve the speed of data retrieval operations, although it can add storage and maintenance overhead.
+
+Q: What is a database transaction?
+A: A transaction is a sequence of database operations treated as a single logical unit that can be committed or rolled back.
+
+
+
